@@ -1,4 +1,3 @@
-| Privacy policy URL | **https://adventureday.co.uk/privacy** — live |
 # Play Console form answers — Adventure Day
 
 Everything below is the literal answer to give. Your app is unusually simple to
@@ -62,7 +61,7 @@ and where you stand:
 
 | Requirement | Status |
 |---|---|
-| Privacy policy URL | `store/PRIVACY.md` — needs hosting |
+| Privacy policy URL | **https://adventureday.co.uk/privacy** — live ✅ |
 | No ads, or certified Families ad SDK only | ✅ no ads at all |
 | No collection of personal info from children | ✅ collects nothing |
 | Content appropriate for the age declared | ✅ |
@@ -98,7 +97,7 @@ and where you stand:
 | Phone screenshots (min 2, max 8) | `store/screenshots/` |
 | Category | Games → Educational |
 | Contact email | summerdetectordad@gmail.com |
-| Privacy policy URL | needs hosting — see below |
+| Privacy policy URL | **https://adventureday.co.uk/privacy** — live |
 
 ---
 
