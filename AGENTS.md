@@ -220,3 +220,16 @@ meadow is worse than a card with slightly smaller text.
 DEBUG RENDERS: probe scripts save screenshots to `user://`, which is that same
 app_userdata folder. Clean them up when the probe is done — otherwise they pile
 up next to the save file. Delete the PNGs, never the JSON.
+
+## The Windows icon
+
+`store/AdventureDay.ico` is a six-size icon (16/32/48/64/128/256) built by
+`tools/make_icon.sh` from `store/play_icon_512.png`, and embedded at export
+time via rcedit (`C:\BuildTools\rcedit-x64.exe`, path set in the editor
+settings). With a single size in the file the export warns and Windows picks a
+badly scaled icon for the taskbar.
+
+`tools/check_icon.sh` parses an .ico back and confirms every directory entry
+points at a real PNG inside the file — worth running if the icon is ever
+regenerated. GOTCHA: bash's printf reads `\x` escapes greedily and produced a
+subtly wrong file; the script uses octal `\NNN` instead.
