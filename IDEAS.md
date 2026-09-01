@@ -3,10 +3,15 @@
 Unbuilt. Append freely; build only when asked. Every idea must pass the
 invariants in AGENTS.md (no fail state, no required reading, calm, offline).
 
+> The treehouse building rework, world zones (market, dino/pirate land),
+> top-bar counters and the food loop have graduated from this list into
+> **PLAN.md** — a worked design rather than a one-liner. Still unbuilt.
+
 ## Art & drawing (she loves to draw — high value)
 
-- Drawing corner in the treehouse: finger-paint canvas (touch draw, big soft
-  brush, limited pastel palette, save to gallery wall in the museum).
+- (Sketch pad drawing suite BUILT — lives in the backpack. Unbuilt polish:
+  show her actual saved drawings/photos framed in the museum instead of the
+  generic "drawing"/"photo" icons.)
 - Colouring-in: outline versions of the finds she's collected, finger-colour
   them, coloured version replaces the plain one on the shelf.
 - Her drawings displayed in frames on the museum wall alongside the finds.
@@ -23,6 +28,9 @@ invariants in AGENTS.md (no fail state, no required reading, calm, offline).
   (Allotment Helper Day).
 - Train between zones (Train Adventure to Wales / Train and Bus to the Plane).
 - Weather/seasons; day-night with fireflies.
+- Cave zone + a torch backpack item: she can see fine anyway, but the torch
+  reveals extras — bats, crystals, precious stones (torch is waiting on the
+  cave existing).
 - Secret location that appears occasionally (Tadpoles, Bird Nest and a Secret
   Location).
 

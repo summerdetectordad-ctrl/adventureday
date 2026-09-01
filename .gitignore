@@ -7,3 +7,14 @@ android/
 # Export presets hold keystore paths/passwords once Android export is set up.
 # Keep them out of the repo; recreate per-machine (see README).
 export_presets.cfg
+
+# --- Android build output and signing material ---
+build/
+android/build/
+android/.build_version
+*.apk
+*.aab
+*.idsig
+# the real keystore lives OUTSIDE the repo, in C:\AdventureDayKeys
+*.keystore
+*.jks

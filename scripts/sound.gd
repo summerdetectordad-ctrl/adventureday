@@ -108,6 +108,57 @@ func woof() -> void:
 	play_note(150.0, 100.0, 0.14, 0.2, 0.16)
 
 
+func hoot() -> void:
+	play_note(392.0, 330.0, 0.22, 0.16)
+	play_note(330.0, 294.0, 0.34, 0.16, 0.28)
+
+
+func knock() -> void:
+	play_note(190.0, 120.0, 0.07, 0.2)
+	play_note(120.0, 90.0, 0.06, 0.12, 0.05)
+
+
+func whistle() -> void:
+	play_note(880.0, 1320.0, 0.18, 0.13)
+	play_note(1320.0, 880.0, 0.18, 0.13, 0.22)
+
+
+func gulp() -> void:
+	play_note(300.0, 180.0, 0.12, 0.15)
+	play_note(280.0, 170.0, 0.12, 0.13, 0.16)
+
+
+func munch() -> void:
+	play_note(220.0, 140.0, 0.1, 0.18)
+	play_note(200.0, 130.0, 0.1, 0.15, 0.12)
+
+
+func shutter() -> void:
+	play_note(1000.0, 700.0, 0.05, 0.12)
+	play_note(700.0, 1000.0, 0.05, 0.12, 0.07)
+
+
+func swish() -> void:
+	play_note(600.0, 900.0, 0.12, 0.1)
+
+
+func jump_sound() -> void:
+	play_note(330.0, 540.0, 0.16, 0.13)
+
+
+func land_sound() -> void:
+	play_note(210.0, 160.0, 0.1, 0.1)
+
+
+func splash() -> void:
+	play_note(520.0, 240.0, 0.28, 0.16)
+	play_note(760.0, 340.0, 0.2, 0.1, 0.08)
+
+
+func grab_sound() -> void:
+	play_note(420.0, 620.0, 0.12, 0.14)
+
+
 func bell() -> void:
 	play_note(1318.5, 1318.5, 0.5, 0.15)           # E6, bicycle bell-ish
 	play_note(1318.5, 1318.5, 0.5, 0.12, 0.15)

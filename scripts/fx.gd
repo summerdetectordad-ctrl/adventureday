@@ -63,6 +63,35 @@ static func float_number(parent: Node, pos: Vector2, n: int) -> void:
 	tw.tween_callback(np.queue_free)
 
 
+class DirtCrumb extends Node2D:
+	var r := 3.0
+	var col := Color("a67c58")
+
+	func _draw() -> void:
+		draw_circle(Vector2.ZERO, r, col)
+		draw_circle(Vector2(-r * 0.3, -r * 0.3), r * 0.45, col.lightened(0.12))
+
+
+## Little crumbs of earth arcing out of a dig.
+static func dirt(parent: Node, pos: Vector2, n := 7) -> void:
+	for i in n:
+		var c := DirtCrumb.new()
+		c.r = randf_range(2.0, 4.5)
+		c.col = Color("a67c58").darkened(randf_range(0.0, 0.15))
+		c.position = pos
+		c.z_index = 20
+		parent.add_child(c)
+		var dx := randf_range(-42.0, 42.0)
+		var up := randf_range(22.0, 46.0)
+		var tw := c.create_tween()
+		tw.tween_property(c, "position", pos + Vector2(dx * 0.6, -up), 0.22) \
+			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+		tw.tween_property(c, "position", pos + Vector2(dx, 4.0), 0.28) \
+			.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+		tw.parallel().tween_property(c, "modulate:a", 0.0, 0.28)
+		tw.tween_callback(c.queue_free)
+
+
 static func hearts(parent: Node, pos: Vector2, n := 3) -> void:
 	for i in n:
 		var h := FloatHeart.new()
