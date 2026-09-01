@@ -309,22 +309,36 @@ class Overlay extends Control:
 				"in " + BuildDefs.TIER_NAME[nt], HORIZONTAL_ALIGNMENT_LEFT, -1, 22,
 				Color("a2917a"))
 
-		# what it needs, as dots she can count plus the numeral
+		# WHAT IT NEEDS. Coloured dots told her how many but never which — the
+		# colour alone does not say "rope". So each line is the material's own
+		# picture, the numeral, and the word, laid out exactly like the counters
+		# along the top of the screen, which she already reads fluently.
+		#
+		# Underneath, how many she actually has, but only when it is short —
+		# saying "you have 4" when she has plenty is just noise.
 		var wob := sin(body.wiggle * PI * 4.0) * 6.0 * body.wiggle
-		var y := panel.position.y + 130.0
+		var y := panel.position.y + 132.0
 		for k in cost:
 			var n: int = int(cost[k])
 			var have: int = int(GameState.materials.get(k, 0))
-			var col := mat_colour(k)
-			for i in n:
-				var dp := Vector2(panel.position.x + 30 + i * 26.0 + wob, y)
-				draw_circle(dp, 10.0, col if i < have else Color("d9cfba"))
-				if i < have:
-					draw_circle(dp + Vector2(-3, -3), 3.4, col.lightened(0.35))
-			draw_string(font, Vector2(panel.position.x + 30 + n * 26.0 + 16 + wob, y + 9),
-				"%d" % n, HORIZONTAL_ALIGNMENT_LEFT, -1, 24,
-				Color("6b4f38") if have >= n else Color("b5a68e"))
-			y += 42.0
+			var enough := have >= n
+			var ink := Color("6b4f38") if enough else Color("c07a6a")
+			var x := panel.position.x + 34.0 + wob
+
+			draw_set_transform(Vector2(x + 20.0, y), 0.0, Vector2.ONE)
+			DrawKit.draw_material(self, k, 21.0)
+			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+			draw_string(font, Vector2(x + 54.0, y + 13.0), "%d" % n,
+				HORIZONTAL_ALIGNMENT_LEFT, -1, 38, ink)
+			draw_string(font, Vector2(x + 92.0, y + 11.0),
+				str(TopBar.NAMES.get(k, k)), HORIZONTAL_ALIGNMENT_LEFT, -1, 26, ink)
+			if not enough:
+				draw_string(font, Vector2(x + 54.0, y + 38.0),
+					"you have %d" % have, HORIZONTAL_ALIGNMENT_LEFT, -1, 19,
+					Color("b5a68e"))
+				y += 20.0
+			y += 50.0
 
 		# the paint swatches, when this upgrade is the painted one
 		if mode == "upgrade" and GameState.tier_of(body.selected) + 1 == BuildDefs.MAX_TIER \

@@ -304,3 +304,21 @@ Dampened, not zeroed: their body genuinely is in front of the button, so a tap
 there should reach the stall, but a tap on their head is above the band and
 still reaches them. The stall's own tap radius came down from 150 to 105 for
 the same reason — at 150 it won the tap on a customer's own head.
+
+## Material icons
+
+`DrawKit.draw_material(c, kind, s)` is the ONLY set — scalable, used by the top
+bar counters, the plan board costs and the market stalls. There used to be two
+sets: TopBar had its own six, DrawKit knew three, and they had drifted. If you
+add a material, add it here and it appears everywhere at once.
+
+The rope was a green ring and read as a doughnut — nobody knew what it was
+until the word appeared under it. What makes rope read as rope is the TWIST and
+a loose end, so it now has both, in hemp rather than green.
+
+BUILD COSTS are the material's own picture, the numeral and the word, laid out
+like the counters along the top of the screen which she already reads. Coloured
+dots told her how many but never WHICH — and three of the six materials were
+falling through to an identical brown circle, so half the costs were
+indistinguishable. Under a line she cannot afford it says how many she has, but
+only then; "you have 4" when she has plenty is just noise.

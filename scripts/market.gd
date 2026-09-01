@@ -387,10 +387,12 @@ class Stall extends Node2D:
 					draw_rect(Rect2(p.x - 24, p.y - i * 9.0, 48, 8), Color("c9a06c"))
 					draw_rect(Rect2(p.x - 24, p.y - i * 9.0, 48, 2.5), Color("d9b485"))
 			"rope":
+				# the same coil the counters and the plan board use, so rope looks
+				# like rope everywhere
 				for i in 2:
-					draw_arc(Vector2(p.x, p.y - 10 - i * 17.0), 14.0, 0, TAU, 20, Color("9a8055"), 6.0, true)
-					draw_arc(Vector2(p.x, p.y - 10 - i * 17.0), 14.0, PI * 0.9, PI * 1.6, 8,
-						Color("b39a6d"), 2.4, true)
+					draw_set_transform(Vector2(p.x, p.y - 14 - i * 26.0), 0.0, Vector2.ONE)
+					DrawKit.draw_material(self, "rope", 15.0)
+				draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 			"seed":
 				# paper packets with a flower on the front
 				for i in 3:

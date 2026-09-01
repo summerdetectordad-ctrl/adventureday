@@ -284,11 +284,72 @@ static func draw_material(c: CanvasItem, kind: String, s: float) -> void:
 			c.draw_circle(Vector2(-s * 0.72, -s * 0.14), s * 0.08, Color("8a6a44"))
 			c.draw_circle(Vector2(s * 0.72, -s * 0.14), s * 0.08, Color("8a6a44"))
 		"rope":
-			c.draw_arc(Vector2.ZERO, s * 0.62, 0, TAU, 16, Color("55763f"), s * 0.42, true)
-			c.draw_arc(Vector2.ZERO, s * 0.62, 0, TAU, 16, Color("6f9a5d"), s * 0.26, true)
-			c.draw_arc(Vector2.ZERO, s * 0.3, 0, TAU, 12, Color("6f9a5d"), s * 0.2, true)
-			c.draw_line(Vector2(-s * 0.15, -s * 0.6), Vector2(s * 0.2, -s * 0.68), Color("55763f"), s * 0.18)
-			c.draw_line(Vector2(s * 0.5, s * 0.4), Vector2(s * 0.85, s * 0.62), Color("6f9a5d"), s * 0.16)
+			# A coil of hemp, not a green ring. The old one read as a doughnut:
+			# nobody knew what it was until the word appeared under it. What
+			# makes rope read as rope is the TWIST and a loose end, so both are
+			# here, and the colour is hemp rather than green.
+			var dark := Color("8a6f45")
+			var mid := Color("b8985f")
+			var lite := Color("d9bd88")
+			# the loose end first, so the coil sits on top of it
+			var e0 := Vector2(s * 0.55, s * 0.5)
+			var e1 := Vector2(s * 1.12, s * 0.78)
+			c.draw_line(e0, e1, dark, s * 0.28)
+			c.draw_line(e0, e1, mid, s * 0.18)
+			for i in 3:
+				c.draw_line(e1, e1 + Vector2(s * 0.2, s * (-0.1 + i * 0.1)),
+					lite, s * 0.055)
+			# two coils
+			c.draw_arc(Vector2.ZERO, s * 0.74, 0, TAU, 26, dark, s * 0.36, true)
+			c.draw_arc(Vector2.ZERO, s * 0.74, 0, TAU, 26, mid, s * 0.25, true)
+			c.draw_arc(Vector2.ZERO, s * 0.36, 0, TAU, 20, dark, s * 0.28, true)
+			c.draw_arc(Vector2.ZERO, s * 0.36, 0, TAU, 20, mid, s * 0.18, true)
+			# the twist, which is the bit that actually says "rope"
+			for i in 13:
+				var a := TAU * i / 13.0
+				c.draw_line(Vector2.from_angle(a) * s * 0.63,
+					Vector2.from_angle(a + 0.5) * s * 0.86, lite, s * 0.08)
+			for i in 8:
+				var a2 := TAU * i / 8.0
+				c.draw_line(Vector2.from_angle(a2) * s * 0.26,
+					Vector2.from_angle(a2 + 0.62) * s * 0.47, lite, s * 0.07)
+		"timber":
+			# a sawn beam: thicker and darker than a plank, and turned slightly
+			# so the end grain shows. That end is what tells the two apart.
+			rounded_rect(c, Rect2(-s, -s * 0.6, s * 2.0, s * 1.2), s * 0.1, Color("6e5039"))
+			rounded_rect(c, Rect2(-s * 0.94, -s * 0.52, s * 1.88, s * 1.04), s * 0.08,
+				Color("a87c4e"))
+			c.draw_rect(Rect2(-s * 0.94, -s * 0.52, s * 1.88, s * 0.24), Color("bb8f5e"))
+			ellipse(c, Vector2(s * 0.76, 0), s * 0.19, s * 0.5, Color("c9a06c"))
+			ellipse(c, Vector2(s * 0.76, 0), s * 0.11, s * 0.3, Color("a87c4e"))
+			c.draw_line(Vector2(-s * 0.6, s * 0.16), Vector2(s * 0.3, s * 0.2),
+				Color("8a6242"), s * 0.07)
+		"paint":
+			# a tin with a handle, colour inside and a drip down the side
+			c.draw_arc(Vector2(0, -s * 0.6), s * 0.56, PI, TAU, 12, Color("8a95a0"),
+				s * 0.13, true)
+			rounded_rect(c, Rect2(-s * 0.66, -s * 0.6, s * 1.32, s * 1.24), s * 0.12,
+				Color("9aa2ac"))
+			rounded_rect(c, Rect2(-s * 0.58, -s * 0.52, s * 1.16, s * 1.08), s * 0.1,
+				Color("c2c8ce"))
+			rounded_rect(c, Rect2(-s * 0.58, -s * 0.52, s * 1.16, s * 0.44), s * 0.09,
+				Color("e8918c"))
+			ellipse(c, Vector2(s * 0.5, s * 0.42), s * 0.12, s * 0.2, Color("e8918c"))
+		"seed":
+			# a paper packet with a flower on the front and a few spilled seeds
+			rounded_rect(c, Rect2(-s * 0.58, -s * 0.86, s * 1.16, s * 1.46), s * 0.1,
+				Color("d8c9a4"))
+			rounded_rect(c, Rect2(-s * 0.5, -s * 0.78, s * 1.0, s * 1.3), s * 0.08,
+				Color("efe3c8"))
+			c.draw_rect(Rect2(-s * 0.5, -s * 0.78, s * 1.0, s * 0.24), Color("d8c9a4"))
+			for i in 5:
+				var pa := TAU * i / 5.0 - PI * 0.5
+				c.draw_circle(Vector2(cos(pa), sin(pa)) * s * 0.21 + Vector2(0, -s * 0.08),
+					s * 0.14, Color("e8918c"))
+			c.draw_circle(Vector2(0, -s * 0.08), s * 0.12, Color("ffe6b3"))
+			for i in 3:
+				c.draw_circle(Vector2(-s * 0.28 + i * s * 0.28, s * 0.82), s * 0.09,
+					Color("8a6a44"))
 		_:
 			c.draw_circle(Vector2.ZERO, s * 0.6, Color("c9a06c"))
 

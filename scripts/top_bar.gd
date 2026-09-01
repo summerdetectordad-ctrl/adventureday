@@ -137,31 +137,14 @@ func _draw_materials(x: float, font: Font, room: float) -> float:
 	return x + w + GAP
 
 
+## One material, at counter size. The drawings live in DrawKit so the counters,
+## the plan board and the market stalls all show the same picture — there used
+## to be two sets that had quietly drifted apart, and DrawKit's only knew three
+## of the six.
 func _draw_material_icon(c: Vector2, kind: String) -> void:
-	match kind:
-		"stick":
-			draw_line(c + Vector2(-11, 5), c + Vector2(10, -6), Color("55381f"), 6.0)
-			draw_line(c + Vector2(-11, 5), c + Vector2(10, -6), Color("8a6242"), 3.4)
-		"plank":
-			draw_rect(Rect2(c.x - 12, c.y - 5, 24, 10), Color("c9a06c"))
-			draw_rect(Rect2(c.x - 12, c.y - 5, 24, 3.4), Color("d9b485"))
-		"rope":
-			draw_arc(c, 9.0, 0, TAU, 16, Color("9a8055"), 4.4, true)
-			draw_arc(c, 9.0, PI * 0.9, PI * 1.6, 8, Color("b39a6d"), 2.0, true)
-		"timber":
-			draw_rect(Rect2(c.x - 11, c.y - 6, 22, 12), Color("a87c4e"))
-			draw_rect(Rect2(c.x - 11, c.y - 6, 22, 3.4), Color("bb8f5e"))
-		"paint":
-			DrawKit.rounded_rect(self, Rect2(c.x - 8, c.y - 7, 16, 14), 2.0, Color("b8b0a0"))
-			draw_rect(Rect2(c.x - 6, c.y - 5, 12, 4), Color("e8918c"))
-			draw_arc(c + Vector2(0, -7), 7.0, PI, TAU, 8, Color("8a95a0"), 2.0, true)
-		"seed":
-			# a paper packet with a flower on the front
-			DrawKit.rounded_rect(self, Rect2(c.x - 8, c.y - 9, 16, 18), 2.0, Color("efe3c8"))
-			draw_rect(Rect2(c.x - 8, c.y - 9, 16, 4), Color("d8c9a4"))
-			draw_circle(c + Vector2(0, 1), 4.0, Color("e8918c"))
-			draw_circle(c + Vector2(0, 1), 1.6, Color("ffe6b3"))
-
+	draw_set_transform(c, 0.0, Vector2.ONE)
+	DrawKit.draw_material(self, kind, 11.0)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 ## A meter that only ever suggests. Full is a happy meter; empty just glows and
 ## puts a bubble over her head — never a penalty.
