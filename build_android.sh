@@ -5,6 +5,8 @@
 #   ./build_android.sh bump [patch|minor|major]   raise the version
 #   ./build_android.sh apk                  build/AdventureDay.apk  (sideload)
 #   ./build_android.sh aab                  build/AdventureDay.aab  (upload to Play)
+#   ./build_android.sh win                  build/windows/AdventureDay.exe (play on PC)
+#   ./build_android.sh all                  the Windows build and the APK
 #   ./build_android.sh release [patch|minor|major]
 #                                           bump, build the AAB, tag the commit
 #
@@ -137,6 +139,23 @@ build_apk() {
 	fi
 }
 
+## The PC build. Running the project through the editor binary works, but it
+## puts "(DEBUG)" in the title bar and is not the game — this is a real,
+## standalone executable with everything packed inside it.
+build_win() {
+	mkdir -p build/windows
+	echo "Building Windows  v$(current_name)..."
+	"$GODOT" --headless --path "$HERE" --import >/dev/null 2>&1 || true
+	"$GODOT" --headless --path "$HERE" \
+		--export-release "Windows Desktop" "$HERE\\build\\windows\\AdventureDay.exe"
+	ls -lh build/windows/AdventureDay.exe
+	local drop="$USERPROFILE/OneDrive/Desktop/Adventure Day"
+	if [ -d "$drop" ]; then
+		cp build/windows/AdventureDay.exe "$drop/AdventureDay.exe"
+		echo "  copied to Desktop/Adventure Day/"
+	fi
+}
+
 build_aab() {
 	signing_env
 	clean_staging
@@ -183,6 +202,8 @@ case "${1:-apk}" in
 	version) show_version ;;
 	bump)    bump_version "${2:-patch}" ;;
 	aab)     build_aab ;;
+	win)     build_win ;;
+	all)     build_win; build_apk ;;
 	release) do_release "${2:-patch}" ;;
 	apk|*)   build_apk ;;
 esac

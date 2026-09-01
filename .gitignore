@@ -18,3 +18,7 @@ android/.build_version
 # the real keystore lives OUTSIDE the repo, in C:\AdventureDayKeys
 *.keystore
 *.jks
+
+# Windows desktop build
+build/windows/
+*.exe

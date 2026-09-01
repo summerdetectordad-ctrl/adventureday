@@ -208,7 +208,7 @@ meadow is worse than a card with slightly smaller text.
 
 ## Where files go
 
-- `build/` — APKs and AABs. Gitignored. `build_android.sh apk` also drops a
+- `build/` — APKs, AABs and the Windows build. Gitignored. `build_android.sh apk` also drops a
   copy in `Desktop\Adventure Day\` so it is easy to pass to a phone.
 - `Desktop\Adventure Day\` — the APK, a launcher for the PC, and a README.
   Nothing else belongs on the desktop.
