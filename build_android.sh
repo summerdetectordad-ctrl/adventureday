@@ -129,6 +129,12 @@ build_apk() {
 		--export-release "Android" "$HERE\\build\\AdventureDay.apk"
 	verify_apk build/AdventureDay.apk
 	ls -lh build/AdventureDay.apk
+	# drop a copy where it is easy to find and pass to a phone
+	local drop="$USERPROFILE/OneDrive/Desktop/Adventure Day"
+	if [ -d "$drop" ]; then
+		cp build/AdventureDay.apk "$drop/AdventureDay.apk"
+		echo "  copied to Desktop/Adventure Day/"
+	fi
 }
 
 build_aab() {

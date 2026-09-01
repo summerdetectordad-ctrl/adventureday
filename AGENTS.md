@@ -205,3 +205,18 @@ visible height moves with the screen shape and the UI scale). DialogueCard and
 AffirmationCard place themselves below it and SHRINK to fit the strip that is
 available — on a long phone that strip is only ~100 px. A card that covers the
 meadow is worse than a card with slightly smaller text.
+
+## Where files go
+
+- `build/` — APKs and AABs. Gitignored. `build_android.sh apk` also drops a
+  copy in `Desktop\Adventure Day\` so it is easy to pass to a phone.
+- `Desktop\Adventure Day\` — the APK, a launcher for the PC, and a README.
+  Nothing else belongs on the desktop.
+- `C:\AdventureDayKeys\` — the signing key. Outside the repo, on purpose.
+- `%APPDATA%\Godot\app_userdata\Adventure Day\` — Godot's own folder. It holds
+  `adventure_day_save.json`, which is HER SAVED GAME on this machine. Do not
+  delete it.
+
+DEBUG RENDERS: probe scripts save screenshots to `user://`, which is that same
+app_userdata folder. Clean them up when the probe is done — otherwise they pile
+up next to the save file. Delete the PNGs, never the JSON.
