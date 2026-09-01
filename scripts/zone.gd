@@ -40,6 +40,8 @@ var blocks: Array = []
 ## wander, and one parked in front of a button would quietly steal every tap
 ## meant for it.
 var people_keep_clear: Array = []
+## Throttle for the give-way check below; it does not need to run every frame.
+var _mind_t := 0.0
 var ui_layer: CanvasLayer = null
 var busy := false
 
@@ -145,6 +147,8 @@ func _process(delta: float) -> void:
 		add_child(hunger_bubble)
 	if hunger_bubble != null:
 		hunger_bubble.position = player.position + Vector2(-52.0 * player.facing, -122.0)
+
+	mind_her_space(delta)
 
 	if pack != null:
 		pack.position = player.position
@@ -392,7 +396,9 @@ func go_home() -> void:
 ## Everybody who lives in this world, placed along the ground and left to
 ## potter about. `z` puts them behind the scenery where that reads better —
 ## the market traders belong behind their own stalls.
-func spawn_folk(where: String, spots: Array, z := 0, depth := 0.0, roam := 85.0) -> void:
+func spawn_folk(where: String, spots: Array, z := 0, depth := 0.0,
+		roam := 85.0) -> Array:
+	var made: Array = []
 	var ids := Folk.who_lives_in(where)
 	for i in mini(ids.size(), spots.size()):
 		var p := Folk.Person.new()
@@ -408,6 +414,8 @@ func spawn_folk(where: String, spots: Array, z := 0, depth := 0.0, roam := 85.0)
 		p.z_index = z
 		add_child(p)
 		interactables.append(p)
+		made.append(p)
+	return made
 
 
 ## Say hello to somebody. They stop and face her, and the card offers a TALK
@@ -573,3 +581,47 @@ func dismiss_cards() -> void:
 	for c in hud.get_children():
 		if c is DialogueCard or c is AffirmationCard:
 			c.dismiss()
+
+
+## Nobody strolls between her and what she is looking at.
+##
+## While she is stood still at something — a market stall, a fossil wall, a
+## rock pool — the ONE person closest to walking across her changes their mind
+## and ambles the other way instead. Only one, and only the one who was
+## actually about to do it: a whole market turning on its heel at the same
+## moment looks absurd, and the point is that it should not be noticeable.
+##
+## Works in every world for free, because everybody is a Folk.Person and every
+## world fills `interactables`.
+func mind_her_space(delta: float) -> void:
+	if player == null or player.walking or player.riding or player.climbing:
+		return
+	_mind_t -= delta
+	if _mind_t > 0.0:
+		return
+	_mind_t = 0.4
+
+	# is she actually stood at something? (people do not count — being near a
+	# person is the one time you WANT them to stay put)
+	var busy := false
+	for n in interactables:
+		if not is_instance_valid(n) or n is Folk.Person:
+			continue
+		if absf(n.global_position.x - player.position.x) < 130.0:
+			busy = true
+			break
+	if not busy:
+		return
+
+	var nearest: Folk.Person = null
+	var nearest_d := 240.0
+	for n in interactables:
+		if not is_instance_valid(n) or not (n is Folk.Person):
+			continue
+		var p: Folk.Person = n
+		var d: float = absf(p.global_position.x - player.position.x)
+		if d > 14.0 and d < nearest_d and p.heading_toward(player.position.x):
+			nearest_d = d
+			nearest = p
+	if nearest != null:
+		nearest.give_way(player.position.x)

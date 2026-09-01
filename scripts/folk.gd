@@ -230,6 +230,7 @@ class Person extends Node2D:
 	var _pause := 0.0
 	var _talking := false
 	var _wave := 0.0
+	var _give_way_t := 0.0
 
 	func _ready() -> void:
 		t = randf() * 6.0
@@ -269,6 +270,33 @@ class Person extends Node2D:
 		return true
 
 	## Stand still and face her while they are talking.
+	## Which way they are currently ambling, as a sign.
+	func heading() -> float:
+		return _dir
+
+	## True if they are walking toward `x` and close enough to matter.
+	func heading_toward(x: float, within := 260.0) -> bool:
+		if _talking or roam <= 0.5:
+			return false
+		var to := x - global_position.x
+		return absf(to) < within and signf(to) == _dir
+
+	## Politely change your mind about going that way.
+	##
+	## Used when somebody is being served at a stall and this person was about
+	## to stroll between them and the counter. They pause, as if they noticed,
+	## then wander off the other way. Only ever asked of the ONE person closest
+	## to causing the problem — a whole market turning on its heel at once
+	## looks very odd indeed.
+	func give_way(from_x: float) -> void:
+		if _give_way_t > 0.0 or _talking:
+			return
+		_give_way_t = 3.5
+		_dir = signf(global_position.x - from_x)
+		if _dir == 0.0:
+			_dir = 1.0
+		_pause = randf_range(0.25, 0.6)
+
 	func attend(toward_x: float) -> void:
 		_talking = true
 		_dir = signf(toward_x - global_position.x)
@@ -283,19 +311,26 @@ class Person extends Node2D:
 		t += delta
 		if _wave > 0.0:
 			_wave = maxf(0.0, _wave - delta * 0.7)
+		if _give_way_t > 0.0:
+			_give_way_t = maxf(0.0, _give_way_t - delta)
 		if not _talking and roam > 0.5:
 			if _pause > 0.0:
 				_pause -= delta
 			else:
 				position.x += _dir * speed * delta
+				# at the end of the patch, turn round and have a think. While
+				# giving way they wait longer, so they do not simply march
+				# straight back across the front of the stall.
+				var think := randf_range(2.5, 4.0) if _give_way_t > 0.0 \
+					else randf_range(0.6, 2.4)
 				if position.x < home_x - roam:
 					position.x = home_x - roam
 					_dir = 1.0
-					_pause = randf_range(0.6, 2.4)
+					_pause = think
 				elif position.x > home_x + roam:
 					position.x = home_x + roam
 					_dir = -1.0
-					_pause = randf_range(0.6, 2.4)
+					_pause = think
 		queue_redraw()
 
 	func walking() -> bool:

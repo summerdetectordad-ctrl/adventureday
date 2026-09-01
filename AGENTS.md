@@ -285,6 +285,14 @@ Z-ORDER: background < traders (1) < stalls (2) < customers and Summer (4).
 Summer used to be at the default 0 and vanished behind every stall she walked
 past.
 
+PEOPLE GET OUT OF THE WAY. `Zone.mind_her_space()` runs in every world: while
+she is stood still at something that is not a person, the ONE person closest to
+walking across her `give_way()`s and ambles off the other way instead. Only
+one, and only the one actually heading toward her — a whole market turning on
+its heel at the same moment looks absurd, and the point is that it should not
+be noticeable. This is the real fix for people blocking a counter; the tap
+damping below is the safety net for when one is already there.
+
 `Zone.people_keep_clear` is a list of world rectangles where a person's tap
 score is DAMPENED to 0.3 — the market fills it with each stall's button band.
 Dampened, not zeroed: their body genuinely is in front of the button, so a tap
