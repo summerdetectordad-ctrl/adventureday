@@ -7,7 +7,7 @@ extends Zone
 ## to be patted, the volcano only ever puffs, and the dig wall gives up a find
 ## every time — it just takes a few brushes. No fail state, as everywhere else.
 
-const WORLD_W := 2600.0
+const WORLD_W := 2900.0
 const HOME_SIGN_X := 90.0
 
 
@@ -16,7 +16,7 @@ func _ready() -> void:
 	setup_ground(WORLD_W, "dino")
 
 	var volcano := Volcano.new()
-	volcano.position = Vector2(1980.0, GROUND_Y)
+	volcano.position = Vector2(1060.0, GROUND_Y)
 	add_child(volcano)
 
 	for spec in [[520.0, 0], [980.0, 1], [1560.0, 2]]:
@@ -27,9 +27,17 @@ func _ready() -> void:
 
 	# the cave in the valley wall, and whoever is grumbling inside it
 	var cave := CaveMouth.new()
-	cave.position = Vector2(1900.0, GROUND_Y)
+	cave.position = Vector2(2180.0, GROUND_Y)
 	add_child(cave)
 	interactables.append(cave)
+	# nothing else claims a tap over the mouth — she needs to be able to get in
+	people_keep_clear.append(Rect2(2180.0 - 120.0, GROUND_Y - 240.0, 240.0, 250.0))
+
+	# a sign to the right of it, pointing back at the entrance
+	var warn := CaveSign.new()
+	warn.position = Vector2(2520.0, GROUND_Y)
+	add_child(warn)
+	interactables.append(warn)
 
 	var home := Grove.Signpost.new()
 	home.dir = -1.0
@@ -60,10 +68,13 @@ func _ready() -> void:
 	add_child(bone_game)
 	interactables.append(bone_game)
 
-	# a mix of gentle grazers spread down the valley, all of them wandering
+	# Gentle grazers spread down the valley, and NOT across the cave mouth
+	# (2040..2320) —
+	# they wander 220 either way, and a longneck parked in the entrance meant
+	# she could not get in at all.
 	for spec in [[420.0, "compy"], [470.0, "compy"], [520.0, "compy"],
-			[980.0, "longneck"], [1500.0, "trike"], [2060.0, "stego"],
-			[2150.0, "longneck"]]:
+			[900.0, "longneck"], [1380.0, "trike"], [1660.0, "stego"],
+			[2740.0, "longneck"]]:
 		var dino := Dino.new()
 		dino.species = spec[1]
 		dino.position = Vector2(spec[0], GROUND_Y)
@@ -79,7 +90,7 @@ func _ready() -> void:
 	interactables.append(bike)
 
 	setup_player(arrival_x({"home": 200.0, "cove": WORLD_W - 220.0,
-		"cave": 1900.0 - 190.0, "bike": 700.0}, 240.0))
+		"cave": 2180.0 - 210.0, "bike": 700.0}, 240.0))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -140,6 +151,13 @@ func _interact(node: Node2D, wp: Vector2) -> void:
 		open_game(BoneGame.new())
 	elif node is CaveMouth:
 		travel_to("res://scenes/dino_cave.tscn", "dino")
+	elif node is CaveSign:
+		# the sign points at the cave; tapping it just reads it aloud, so to
+		# speak — she still has to walk over and go in herself
+		node.try_tap(Vector2.ZERO)
+		DialogueCard.show_chat(hud, "what does that say?",
+			"a t-rex lives in that cave!", "tell",
+			"he is grumpy, but he is not dangerous. he just gets splinters.")
 	elif node is Nature.Bike:
 		open_bike_map(node)
 	elif node is Folk.Person:
@@ -560,3 +578,80 @@ class CaveMouth extends Node2D:
 		for i in 3:
 			DrawKit.ellipse(self, Vector2(130.0 + i * 46.0, 14.0), 15.0, 8.0,
 				Color(0.35, 0.30, 0.24, 0.22))
+
+
+## The sign beside the cave mouth, pointing back at it.
+##
+## He is entirely friendly once she has pulled the splinter out, so this is a
+## bit of theatre rather than a real warning — but a dark hole in a rock face
+## deserves a sign, and "danger" is exactly the sort of word a five-year-old
+## wants to be able to read. At the picture level it is a t-rex face and an
+## arrow, which says the same thing without a word on it.
+class CaveSign extends Node2D:
+	var _t := 0.0
+
+	func _ready() -> void:
+		_t = randf() * 4.0
+
+	func _process(delta: float) -> void:
+		_t += delta
+		queue_redraw()
+
+	func tap_score(wp: Vector2) -> float:
+		return clampf(1.0 - (wp - global_position - Vector2(0, -110.0)).length() / 90.0,
+			0.0, 1.0)
+
+	func try_tap(_wp: Vector2) -> bool:
+		Sound.knock()
+		return true
+
+	func _draw() -> void:
+		var post := Color("8a6a52")
+		var board := Color("d9b485")
+		var ink := Color("6b4f38")
+		var sway := sin(_t * 1.1) * 0.9
+		DrawKit.soft_shadow(self, Vector2(4, 2), 34.0, 0.14)
+		draw_line(Vector2(0, 0), Vector2(0, -108), post.darkened(0.25), 11.0)
+		draw_line(Vector2(-2, 0), Vector2(-2, -108), post, 6.0)
+
+		draw_set_transform(Vector2(0, -156), deg_to_rad(sway), Vector2.ONE)
+		# the board, with a nailed-on look
+		DrawKit.rounded_rect(self, Rect2(-86, -56, 172, 112), 10.0, Color("a97e54"))
+		DrawKit.rounded_rect(self, Rect2(-80, -50, 160, 100), 8.0, board)
+		for sx in [-68.0, 68.0]:
+			for sy in [-40.0, 40.0]:
+				draw_circle(Vector2(sx, sy), 3.0, Color("8a6a52"))
+
+		# the words go along the top, wrapped, so they stay on the board
+		var font := ThemeDB.fallback_font
+		var lines: Array = [[], ["t-rex!"], ["danger!", "a t-rex lives here"]][
+			clampi(GameState.reading_level, 0, 2)]
+		var ty := -26.0
+		for i in lines.size():
+			var t := str(lines[i])
+			var fs: int = 24 if lines.size() == 1 else (20 if i == 0 else 14)
+			var w := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+			draw_string(font, Vector2(-w * 0.5, ty), t,
+				HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("b8483f"))
+			ty += 20.0
+
+		# a t-rex head and an arrow, side by side underneath — between them they
+		# say the whole thing with no reading at all
+		var hc := Vector2(-38, 24)
+		DrawKit.ellipse(self, hc, 24.0, 16.0, Color("6f9a5e"))
+		DrawKit.rounded_rect(self, Rect2(hc.x - 23, hc.y + 5, 40, 9), 4.0, Color("5e8850"))
+		for i in 4:
+			draw_colored_polygon(PackedVector2Array([
+				Vector2(hc.x - 17 + i * 10, hc.y + 5), Vector2(hc.x - 12 + i * 10, hc.y + 5),
+				Vector2(hc.x - 14.5 + i * 10, hc.y + 13),
+			]), Color("efe6d0"))
+		draw_circle(hc + Vector2(9, -5), 4.6, Color("fff8ec"))
+		draw_circle(hc + Vector2(10, -5), 2.6, Color("3f3a33"))
+		draw_line(hc + Vector2(2, -13), hc + Vector2(14, -8), Color("4e6f42"), 2.4)
+
+		# pointing back to the cave, which is on her left
+		draw_line(Vector2(56, 26), Vector2(20, 26), Color("6b4f38"), 6.0)
+		draw_colored_polygon(PackedVector2Array([
+			Vector2(10, 26), Vector2(24, 18), Vector2(24, 34),
+		]), Color("6b4f38"))
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

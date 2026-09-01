@@ -15,7 +15,10 @@ const TREE2_X := 1020.0
 const TREE3_X := 1300.0
 const SIGN_WEST_X := 92.0
 const SIGN_EAST_X := 4150.0
-const FRUIT_TREE_X := [1700.0, 2600.0, 3560.0]
+## Spaced so nothing lands on anything else — fallen fruit reaches about 70px
+## either side of the trunk, and the middle tree used to drop it straight into
+## the pond, on top of the frogs.
+const FRUIT_TREE_X := [1850.0, 2180.0, 3480.0]
 const GROVE_END_X := 1500.0   # the meadow proper begins here
 const BURIED_COUNT := 6
 const DIG_RANGE := 80.0
@@ -68,7 +71,9 @@ func _ready() -> void:
 	pack_items = Backpack.ITEMS
 	setup_ground(WORLD_W)
 
-	for tree_x in [3100.0, 3950.0]:
+	# 226 sits in the gap between the west signpost and the home tree; 2760
+	# put one standing in the middle of the pond.
+	for tree_x in [226.0, 4020.0]:
 		var tree := Nature.MeadowTree.new()
 		tree.position = Vector2(tree_x, GROUND_Y)
 		tree.tint = randf_range(0.0, 0.08)
@@ -115,7 +120,7 @@ func _ready() -> void:
 		fruit_trees.append(ft)
 
 	garden = Grove.GardenPatch.new()
-	garden.position = Vector2(1430.0, GROUND_Y)
+	garden.position = Vector2(1500.0, GROUND_Y)
 	add_child(garden)
 	interactables.append(garden)
 
@@ -124,7 +129,7 @@ func _ready() -> void:
 	patch_game.game = "pattern"
 	# Up above the garden it belongs to, and clear of the log at 1560 — the
 	# star used to sit right on it, so aiming at the log hit the star.
-	patch_game.position = Vector2(1440.0, GROUND_Y - 200.0)
+	patch_game.position = Vector2(1500.0, GROUND_Y - 200.0)
 	add_child(patch_game)
 	interactables.append(patch_game)
 
@@ -146,7 +151,7 @@ func _ready() -> void:
 
 	# a wise little owl on the middle meadow tree
 	var owl := Nature.Owl.new()
-	owl.position = Vector2(3152.0, GROUND_Y - 170.0)
+	owl.position = Vector2(4062.0, GROUND_Y - 170.0)
 	add_child(owl)
 	interactables.append(owl)
 
@@ -155,7 +160,7 @@ func _ready() -> void:
 	add_child(bike)
 	interactables.append(bike)
 
-	for bush_x in [1620.0, 2200.0, 3450.0]:
+	for bush_x in [1660.0, 2420.0, 3260.0]:
 		var bush := Nature.BerryBush.new()
 		bush.position = Vector2(bush_x, GROUND_Y)
 		add_child(bush)
@@ -181,25 +186,23 @@ func _ready() -> void:
 		puddles.append(pud)
 
 	var bird_tree := Nature.BirdTree.new()
-	bird_tree.position = Vector2(1900.0, GROUND_Y)
+	bird_tree.position = Vector2(2000.0, GROUND_Y)
 	add_child(bird_tree)
 	interactables.append(bird_tree)
 
 	var picnic := Nature.PicnicBlanket.new()
-	picnic.position = Vector2(3720.0, GROUND_Y)
+	picnic.position = Vector2(3860.0, GROUND_Y)
 	add_child(picnic)
 	interactables.append(picnic)
 
 	# blocks to jump over and stand on
 	for spec in [
-		# 3050 not 1560: at 1560 the berry bush next to it hung fruit right over
-		# the log, so aiming at the log picked berries instead
+		# Placed in the gaps between everything else. Blocks used to sit half
+		# inside a tree or a berry bush; see the layout check in AGENTS.md.
+		["crate", 2330.0, 120.0, 72.0],
+		["rock", 2540.0, 132.0, 58.0],
 		["log", 3050.0, 116.0, 54.0],
-		["crate", 2050.0, 120.0, 72.0],
-		["rock", 2450.0, 132.0, 58.0],
-		# 3180 not 3270: one of the children wanders over 3230-3450, and a kid
-		# standing on the crate stole the taps meant for jumping it
-		["crate", 3180.0, 120.0, 72.0],
+		["crate", 3660.0, 120.0, 72.0],
 	]:
 		var blk := Nature.Block.new()
 		blk.kind = spec[0]

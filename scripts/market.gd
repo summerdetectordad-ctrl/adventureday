@@ -12,7 +12,9 @@ extends Zone
 ## Stalls never run out and nothing is ever unavailable, so there is no way to
 ## come away disappointed.
 
-const WORLD_W := 1720.0
+## Wide enough that the trees, the bike and the row of stalls each have their
+## own ground rather than standing inside one another.
+const WORLD_W := 1980.0
 const HOME_SIGN_X := 100.0
 
 ## Every stall: what it trades, the fruit it asks, and how it looks. `sell` is
@@ -39,7 +41,8 @@ func _ready() -> void:
 	zone_name = "market"
 	setup_ground(WORLD_W)
 
-	for tree_x in [220.0, 1670.0]:
+	# one in the gap between the signpost and the first stall, one past the end
+	for tree_x in [230.0, 1850.0]:
 		var tree := Nature.MeadowTree.new()
 		tree.position = Vector2(tree_x, GROUND_Y)
 		add_child(tree)
@@ -91,7 +94,7 @@ func _ready() -> void:
 
 	# her bike, so the whole land is two taps from anywhere
 	var bike := Nature.Bike.new()
-	bike.position = Vector2(300.0, GROUND_Y)
+	bike.position = Vector2(1700.0, GROUND_Y)
 	add_child(bike)
 	interactables.append(bike)
 

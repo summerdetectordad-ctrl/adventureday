@@ -322,3 +322,25 @@ dots told her how many but never WHICH — and three of the six materials were
 falling through to an identical brown circle, so half the costs were
 indistinguishable. Under a line she cannot afford it says how many she has, but
 only then; "you have 4" when she has plenty is just noise.
+
+## Nothing standing inside anything else
+
+Fallen fruit was landing in the pond on top of the frogs, and a dinosaur was
+parked in the cave mouth so she could not get in. Both are the same thing: two
+objects placed at overlapping x with no check.
+
+Everything on the ground has a rough footprint — a fruit tree reaches about
+100px (its fallen fruit lands within 70 of the trunk), the pond is
+`WATER_HALF_W`, a block is `w/2`, a treehouse about 105. A probe that walks
+every world's children, sorts them by x and reports pairs whose footprints
+overlap by more than ~40px found ten in the meadow alone, two of which were
+introduced by earlier fixes that moved things without checking.
+
+Rebuild that probe after any layout change. Small overlaps (under ~40px) are
+fine and look natural — a bike leaning near a table. What matters is a thing
+standing *inside* another, or on top of something she needs to tap.
+
+The cave mouth is also in `people_keep_clear`, and the dinosaurs are placed so
+no patrol (they roam 220) reaches 2040..2320. A sign to the right of it points
+back at the entrance: picture-only at the picture reading level, "t-rex!" at
+words, "danger! / a t-rex lives here" at sentences.
