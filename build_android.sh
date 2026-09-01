@@ -98,6 +98,29 @@ clean_staging() {
 	rm -rf android/build/src/instrumented/assets/* 2>/dev/null || true
 }
 
+## Put a finished build where it is easy to find and pass to a phone.
+##
+## If the game is OPEN, Windows locks the file and the copy fails — and the
+## folder is then left holding the previous version while the build output says
+## everything succeeded. That happened, and a stale build was tested for a good
+## ten minutes before anyone noticed. So this says so, loudly.
+drop_copy() {
+	local src="$1"
+	local name="$2"
+	local drop="$USERPROFILE/OneDrive/Desktop/Adventure Day"
+	[ -d "$drop" ] || return 0
+	if cp "$src" "$drop/$name" 2>/dev/null; then
+		echo "  copied to Desktop/Adventure Day/$name"
+		return 0
+	fi
+	echo "" >&2
+	echo "COULD NOT UPDATE Desktop/Adventure Day/$name — the file is in use." >&2
+	echo "The game is probably still open. Close it and run this again, or the" >&2
+	echo "copy on the desktop will stay on the PREVIOUS version." >&2
+	echo "The new build is fine, it is at $src" >&2
+	exit 1
+}
+
 signing_env() {
 	export GODOT_ANDROID_KEYSTORE_RELEASE_PATH="C:/AdventureDayKeys/upload.keystore"
 	export GODOT_ANDROID_KEYSTORE_RELEASE_USER="adventureday"
@@ -131,12 +154,7 @@ build_apk() {
 		--export-release "Android" "$HERE\\build\\AdventureDay.apk"
 	verify_apk build/AdventureDay.apk
 	ls -lh build/AdventureDay.apk
-	# drop a copy where it is easy to find and pass to a phone
-	local drop="$USERPROFILE/OneDrive/Desktop/Adventure Day"
-	if [ -d "$drop" ]; then
-		cp build/AdventureDay.apk "$drop/AdventureDay.apk"
-		echo "  copied to Desktop/Adventure Day/"
-	fi
+	drop_copy build/AdventureDay.apk AdventureDay.apk
 }
 
 ## The PC build. Running the project through the editor binary works, but it
@@ -149,11 +167,7 @@ build_win() {
 	"$GODOT" --headless --path "$HERE" \
 		--export-release "Windows Desktop" "$HERE\\build\\windows\\AdventureDay.exe"
 	ls -lh build/windows/AdventureDay.exe
-	local drop="$USERPROFILE/OneDrive/Desktop/Adventure Day"
-	if [ -d "$drop" ]; then
-		cp build/windows/AdventureDay.exe "$drop/AdventureDay.exe"
-		echo "  copied to Desktop/Adventure Day/"
-	fi
+	drop_copy build/windows/AdventureDay.exe AdventureDay.exe
 }
 
 build_aab() {

@@ -256,3 +256,14 @@ waiting for the next report.
 A probe that samples the world and reports where two interactables both score
 highly — and where any interactable's zone covers a block — found all of these
 at once. Rebuild it if the layout changes much.
+
+GOTCHA: `drop_copy` fails if the game is open — Windows locks the exe. It used
+to fail silently and leave the previous version sitting on the desktop while
+the build output said everything worked; a stale build got tested for ten
+minutes before anyone noticed. It now stops with a clear message. Close the
+game before rebuilding.
+
+CARDS CLOSE WHEN SHE MOVES ON. `Zone.handle_tap` calls `dismiss_cards()` on
+every tap that reaches the world, so walking away or reaching for something
+else puts the speech bubble away. Taps on the card's own talk button never
+reach the world, so pressing that is safe.

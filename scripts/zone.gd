@@ -152,6 +152,10 @@ func _process(delta: float) -> void:
 ## First refusal on a tap: the backpack ring, the bubbles, and tapping Summer
 ## herself. Returns true when the tap has been dealt with.
 func handle_tap(screen_pos: Vector2, wp: Vector2) -> bool:
+	# Any tap that reaches the world means she has moved on. Put away whatever
+	# somebody was saying — she is plainly not listening any more. Taps on the
+	# card's own talk button never get here, so pressing that is safe.
+	dismiss_cards()
 	if hud != null and hud.top_bar_tap(screen_pos):
 		return true
 	if pack != null:
@@ -383,13 +387,13 @@ func go_home() -> void:
 ## Everybody who lives in this world, placed along the ground and left to
 ## potter about. `z` puts them behind the scenery where that reads better —
 ## the market traders belong behind their own stalls.
-func spawn_folk(where: String, spots: Array, z := 0, depth := 0.0) -> void:
+func spawn_folk(where: String, spots: Array, z := 0, depth := 0.0, roam := 85.0) -> void:
 	var ids := Folk.who_lives_in(where)
 	for i in mini(ids.size(), spots.size()):
 		var p := Folk.Person.new()
 		p.id = ids[i]
 		p.home_x = float(spots[i])
-		p.roam = 85.0
+		p.roam = roam
 		# `depth` stands them further back: higher up the screen and a little
 		# smaller, which is how a trader gets to be behind their counter and
 		# still be visible over it
@@ -553,3 +557,14 @@ const BIKE_SCENES := {
 	"cove": "res://scenes/pirate_cove.tscn",
 	"cave": "res://scenes/dino_cave.tscn",
 }
+
+
+## Put away any chat or affirmation currently on screen. Called the moment she
+## taps anywhere in the world: if she is walking off or reaching for something
+## else, leaving somebody's speech bubble up is just clutter.
+func dismiss_cards() -> void:
+	if hud == null:
+		return
+	for c in hud.get_children():
+		if c is DialogueCard or c is AffirmationCard:
+			c.dismiss()

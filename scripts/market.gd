@@ -67,7 +67,10 @@ func _ready() -> void:
 		interactables.append(stall)
 
 	# the traders, walking their patch BEHIND the counters
-	spawn_folk("market", [430.0, 900.0, 1350.0], 1, 34.0)
+	# In the GAPS between stalls, not on them. Stalls sit at 400/640/880/1120/
+	# 1340/1560 and are 168 wide, so a trader wandering freely spent half the
+	# time hidden behind one. Small patches keep them where she can see them.
+	spawn_folk("market", [520.0, 1000.0, 1450.0], 1, 34.0, 26.0)
 
 	# her bike, so the whole land is two taps from anywhere
 	var bike := Nature.Bike.new()
