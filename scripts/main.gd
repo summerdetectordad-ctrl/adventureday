@@ -260,7 +260,8 @@ func _ready() -> void:
 	if not GameState.start_card_shown:
 		GameState.start_card_shown = true
 		await get_tree().create_timer(1.4).timeout
-		AffirmationCard.show_card(hud, Affirm.next())
+		if is_inside_tree():
+			AffirmationCard.show_card(hud, Affirm.next())
 
 
 func _exit_tree() -> void:

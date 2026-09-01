@@ -344,3 +344,27 @@ The cave mouth is also in `people_keep_clear`, and the dinosaurs are placed so
 no patrol (they roam 220) reaches 2040..2320. A sign to the right of it points
 back at the entrance: picture-only at the picture reading level, "t-rex!" at
 words, "danger! / a t-rex lives here" at sentences.
+
+## Shipping robustness
+
+Things a game handed to a five-year-old on a tablet has to survive.
+
+- SAVES ARE ATOMIC. `save_game()` writes to `<save>.tmp` and renames. Opening
+  the real file for writing truncates it first, so a tablet losing power
+  mid-write left an empty save and no treehouse. The rename cannot half-happen.
+- SAVES ARE VALIDATED ON LOAD. `_known_find()` filters the basket and the
+  shelves to kinds the game can actually draw. Anything else becomes a mystery
+  blob that nothing recognises and nothing can remove, which is exactly what a
+  stray test value did once.
+- BACK DOES NOT QUIT. `config/quit_on_go_back=false`, and
+  `Zone._notification` / `Museum._notification` close whatever is open instead.
+  The default closes the app outright from anywhere, which for a child who
+  brushed the bezel means the game simply vanishing.
+- The app is saved on `NOTIFICATION_APPLICATION_PAUSED` and `FOCUS_OUT`, so
+  being backgrounded mid-play loses nothing.
+
+AUDIT NOTES: a sweep for dead code found `Player._limb`, `BuildDefs.get_part`,
+`DrawKit.OUTLINE`, `PlankGame._walked` and two `mat_colour` helpers, all
+unreferenced, plus `_walk_until_near` copied identically into four worlds (now
+`Zone.walk_until_near`). Worth re-running: list every `func`, count references,
+and anything with one is dead.

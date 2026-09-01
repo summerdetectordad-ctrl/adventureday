@@ -27,7 +27,6 @@ var _planks: Array = []      # {ch, done}
 var _next := 0               # which letter she is looking for
 var _wobble := -1
 var _wob_t := 0.0
-var _walked := 0.0
 var _rlevel := 1        ## the level this ROUND is being played at, fixed at its
                         ## start — easing off mid-word would change the rules
 var _body: Body = null

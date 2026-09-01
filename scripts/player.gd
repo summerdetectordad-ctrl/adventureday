@@ -417,11 +417,6 @@ const INK := Color("4a3a30")
 
 
 ## A limb segment with a soft outline underneath.
-func _limb(a: Vector2, b: Vector2, col: Color, w: float) -> void:
-	draw_line(a, b, col.darkened(0.35), w + 2.6)
-	draw_line(a, b, col, w)
-
-
 ## Two-bone limb: root -> joint -> tip, joint bulging toward `bend_dir`.
 func _limb2(root: Vector2, tip: Vector2, bend_dir: Vector2, rest_len: float,
 		col: Color, w: float) -> Vector2:

@@ -736,3 +736,15 @@ func _take_off_shelf(slot: int) -> void:
 	_layout_tray()
 	Sound.pop()
 	Fx.sparkles(self, Vector2(node.position.x, TRAY_Y), 4, Color("d9b485"))
+
+
+## Back closes whatever is open, or steps out of the door. The museum is not a
+## Zone, so it needs its own handler — without one, back would do nothing at
+## all in here now that it no longer quits the app.
+func _notification(what: int) -> void:
+	if what != NOTIFICATION_WM_GO_BACK_REQUEST:
+		return
+	if ui_layer != null:
+		ui_layer.closed.emit()
+		return
+	_exit_to_world()

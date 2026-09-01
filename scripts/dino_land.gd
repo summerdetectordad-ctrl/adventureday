@@ -117,7 +117,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if absf(best.global_position.x - player.position.x) > 150.0:
 			player.target_x = best.global_position.x - 70.0 * signf(
 				best.global_position.x - player.position.x)
-			await _walk_until_near(best.global_position.x, 160.0)
+			await walk_until_near(best.global_position.x, 160.0)
 		_interact(best, wp)
 		return
 
@@ -130,14 +130,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	last_tap_pos = wp
 	player.target_x = wp.x
 
-
-func _walk_until_near(x: float, dist: float) -> void:
-	var waited := 0.0
-	while absf(player.position.x - x) > dist and waited < 5.0:
-		await get_tree().process_frame
-		waited += get_process_delta_time()
-		if not is_inside_tree():
-			return
 
 
 func _interact(node: Node2D, wp: Vector2) -> void:

@@ -91,13 +91,18 @@ func _draw() -> void:
 	_draw_plan_icon(next_id, Vector2(0, -66))
 	var cost := BuildDefs.cost_of(next_id)
 	var affordable := GameState.can_afford(cost)
-	var dx := -26.0
+	# the material itself and how many, rather than a row of coloured specks
+	# that never said which material they were
+	var dx := -30.0
 	for k in cost:
 		var n: int = int(cost[k])
-		for i in n:
-			draw_circle(Vector2(dx, -48), 2.6, _mat_colour(k) if affordable else Color("bdb4a2"))
-			dx += 6.5
-		dx += 4.0
+		draw_set_transform(Vector2(dx, -48), 0.0, Vector2.ONE)
+		DrawKit.draw_material(self, k, 7.0)
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		draw_string(ThemeDB.fallback_font, Vector2(dx + 9.0, -43.0), "%d" % n,
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 13,
+			Color("6b4f38") if affordable else Color("bdb4a2"))
+		dx += 26.0
 	if affordable:
 		var glow := 0.35 + 0.25 * sin(_t * 3.0)
 		draw_arc(Vector2(0, -62), 30.0, 0, TAU, 26, Color(1.0, 0.85, 0.54, glow), 3.0, true)
@@ -134,12 +139,3 @@ func _draw_plan_icon(id: String, p: Vector2) -> void:
 		_:
 			DrawKit.star(self, p, 12.0, Color("d9b45c"))
 
-
-func _mat_colour(kind: String) -> Color:
-	match kind:
-		"stick": return Color("8a6242")
-		"plank": return Color("c9a06c")
-		"rope": return Color("9a8055")
-		"timber": return Color("a87c4e")
-		"paint": return Color("e8918c")
-	return Color("8a7355")

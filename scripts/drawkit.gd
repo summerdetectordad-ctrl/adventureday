@@ -3,7 +3,6 @@ class_name DrawKit
 ## no external asset files. Swap real illustrations in later by replacing the
 ## _draw() bodies that call into here; game logic never touches this file.
 
-const OUTLINE := Color("00000014")
 
 
 static func rounded_rect_points(rect: Rect2, radius: float) -> PackedVector2Array:

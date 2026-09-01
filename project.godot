@@ -8,7 +8,10 @@ config_version=5
 
 config/name="Adventure Day"
 run/main_scene="res://scenes/main.tscn"
-config/features=PackedStringArray("4.3", "Mobile")
+# Back must not close the game outright — Zone._notification decides what it
+# should close instead.
+config/quit_on_go_back=false
+config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
 
 [autoload]

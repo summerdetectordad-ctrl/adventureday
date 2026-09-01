@@ -307,9 +307,21 @@ func save_game() -> void:
 		"trex_met": trex_met, "trex_helped_t": trex_helped_t, "trex_spot": trex_spot,
 		"save_version": 2,
 	}
-	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
-	if f:
-		f.store_string(JSON.stringify(data))
+	# WRITE TO A TEMP FILE AND RENAME. Opening the real save for writing
+	# truncates it first, so a tablet losing power mid-write left her with an
+	# empty file and no treehouse. The rename is atomic; the worst case is now
+	# that the last few seconds are lost rather than everything.
+	var tmp := SAVE_PATH + ".tmp"
+	var f := FileAccess.open(tmp, FileAccess.WRITE)
+	if f == null:
+		return
+	f.store_string(JSON.stringify(data))
+	f.close()
+	if FileAccess.get_open_error() != OK:
+		return
+	var d := DirAccess.open(SAVE_PATH.get_base_dir())
+	if d != null:
+		d.rename(tmp.get_file(), SAVE_PATH.get_file())
 
 
 func load_game() -> void:
@@ -322,7 +334,13 @@ func load_game() -> void:
 	var data = JSON.parse_string(f.get_as_text())
 	if typeof(data) != TYPE_DICTIONARY:
 		return
-	satchel = data.get("satchel", [])
+	# Only load finds the game can actually draw. A save edited by hand, or one
+	# written by an older build, could otherwise leave a mystery blob in her
+	# basket that nothing recognises and nothing can remove.
+	satchel = []
+	for k in data.get("satchel", []):
+		if _known_find(str(k)):
+			satchel.append(str(k))
 	muted = bool(data.get("muted", false))
 	fruit = maxi(0, int(data.get("fruit", 0)))
 	thirst_accum = maxf(0.0, float(data.get("thirst", 0.0)))
@@ -344,7 +362,8 @@ func load_game() -> void:
 	shelf = {}
 	var shelf_in: Dictionary = data.get("shelf", {})
 	for key in shelf_in:
-		shelf[int(key)] = shelf_in[key]
+		if _known_find(str(shelf_in[key])):
+			shelf[int(key)] = str(shelf_in[key])
 
 	if data.has("built"):
 		# Version 2 save: parts as they were stored.
@@ -407,3 +426,12 @@ func put_back(index: int) -> void:
 		return
 	satchel.remove_at(index)
 	save_game()
+
+
+## Is this something the game can draw? Photos are generated at the moment she
+## takes them, so they are matched by shape; everything else has to be a real
+## find or a drawing.
+func _known_find(kind: String) -> bool:
+	if kind.begins_with("photo_"):
+		return kind.split("_").size() >= 3
+	return FIND_TYPES.has(kind) or kind == "drawing" or FIND_WORDS.has(kind)

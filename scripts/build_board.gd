@@ -2,8 +2,8 @@ class_name BuildBoard
 extends CanvasLayer
 ## The plan board. Shows the treehouse exactly as it stands, with a glowing
 ## badge on every spot she could build next. Tap a badge and the part appears
-## as a translucent ghost right where it would go, with what it needs shown as
-## dots she can count.
+## as a translucent ghost right where it would go, with what it needs listed as
+## the material's own picture, the numeral and the word.
 ##
 ## Unaffordable spots are shown too, and are still tappable — seeing what is
 ## coming is half the fun. Tapping one wiggles the cost rather than refusing;
@@ -368,9 +368,14 @@ class Overlay extends Control:
 		var y := panel.position.y + 150.0
 		for k in BuildDefs.MATERIALS:
 			var n: int = int(GameState.materials.get(k, 0))
-			draw_circle(Vector2(panel.position.x + 40, y), 12.0, mat_colour(k))
-			draw_string(font, Vector2(panel.position.x + 64, y + 9), "%d" % n,
+			draw_set_transform(Vector2(panel.position.x + 42, y), 0.0, Vector2.ONE)
+			DrawKit.draw_material(self, k, 15.0)
+			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+			draw_string(font, Vector2(panel.position.x + 72, y + 9), "%d" % n,
 				HORIZONTAL_ALIGNMENT_LEFT, -1, 26, Color("6b4f38"))
+			draw_string(font, Vector2(panel.position.x + 104, y + 8),
+				str(TopBar.NAMES.get(k, k)), HORIZONTAL_ALIGNMENT_LEFT, -1, 20,
+				Color("a2917a"))
 			y += 42.0
 
 	func _draw_tabs(vs: Vector2) -> void:
@@ -410,14 +415,6 @@ class Overlay extends Control:
 			if i > 0:
 				draw_line(c + Vector2(-24, 6), c + Vector2(-14, 6), Color("9a8055"), 2.5)
 
-	func mat_colour(kind: String) -> Color:
-		match kind:
-			"stick": return Color("8a6242")
-			"plank": return Color("c9a06c")
-			"rope": return Color("9a8055")
-			"timber": return Color("a87c4e")
-			"paint": return Color("e8918c")
-		return Color("8a7355")
 
 
 ## Which trees the board can show right now. Exposed so the world can check a

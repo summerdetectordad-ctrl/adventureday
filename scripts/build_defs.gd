@@ -382,10 +382,6 @@ const MAX_TIER := 4
 const MATERIALS := ["stick", "plank", "rope", "timber", "paint", "seed"]
 
 
-static func get_part(id: String) -> Dictionary:
-	return PARTS.get(id, {})
-
-
 static func cost_of(id: String) -> Dictionary:
 	return PARTS.get(id, {}).get("cost", {})
 

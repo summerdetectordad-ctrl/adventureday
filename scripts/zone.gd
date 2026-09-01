@@ -625,3 +625,32 @@ func mind_her_space(delta: float) -> void:
 			nearest = p
 	if nearest != null:
 		nearest.give_way(player.position.x)
+
+
+## Walk toward `x` and carry on once she is within `dist` of it, or after a few
+## seconds if something is in the way. Every world that walks her over to a
+## thing she tapped needs this; there used to be four identical copies.
+func walk_until_near(x: float, dist: float) -> void:
+	var waited := 0.0
+	while absf(player.position.x - x) > dist and waited < 5.0:
+		await get_tree().process_frame
+		waited += get_process_delta_time()
+		if not is_inside_tree():
+			return
+
+
+## The Android back button. By default it closes the app outright, from
+## anywhere — which for a five-year-old means the game vanishing mid-sentence
+## because she brushed the wrong part of the bezel. Back now closes whatever is
+## open (the basket, the plan board, a mini-game) and does nothing at all when
+## there is nothing to close. Leaving is done through the door, deliberately.
+func _notification(what: int) -> void:
+	if what != NOTIFICATION_WM_GO_BACK_REQUEST:
+		return
+	if ui_layer != null:
+		ui_layer.closed.emit()
+		return
+	if pack != null:
+		close_pack()
+		return
+	dismiss_cards()
