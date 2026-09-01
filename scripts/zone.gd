@@ -35,6 +35,11 @@ var dogs: Array = []
 var platforms: Array = []
 var vines: Array = []
 var blocks: Array = []
+## World-space rectangles where SCENERY wins a tap over any person standing in
+## front of it — a market counter with its buy and sell buttons, say. People
+## wander, and one parked in front of a button would quietly steal every tap
+## meant for it.
+var people_keep_clear: Array = []
 var ui_layer: CanvasLayer = null
 var busy := false
 

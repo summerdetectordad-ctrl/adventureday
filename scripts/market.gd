@@ -64,13 +64,30 @@ func _ready() -> void:
 		stall.position = Vector2(spec["x"], GROUND_Y)
 		stall.z_index = 2
 		add_child(stall)
+		# the counter and its buy/sell buttons always win a tap over whoever
+		# happens to be standing in front of them
+		# Just the button band, not the whole stall: a tap down here belongs to
+		# the counter, but a tap on the HEAD of a customer standing in front of
+		# it is still meant for them, so they stay talkable.
+		people_keep_clear.append(Rect2(spec["x"] - 76.0, GROUND_Y - 62.0, 152.0, 60.0))
 		interactables.append(stall)
 
 	# the traders, walking their patch BEHIND the counters
-	# In the GAPS between stalls, not on them. Stalls sit at 400/640/880/1120/
-	# 1340/1560 and are 168 wide, so a trader wandering freely spent half the
-	# time hidden behind one. Small patches keep them where she can see them.
-	spawn_folk("market", [520.0, 1000.0, 1450.0], 1, 34.0, 26.0)
+	# ONE TRADER PER STALL, stood at the back of their own pitch: raised and
+	# drawn behind the counter, so head and shoulders show over it, and never
+	# moving, because a shopkeeper who wanders off is not a shopkeeper.
+	var pitches: Array = []
+	for spec in STALLS:
+		# a little to one side, so they stand BESIDE their goods rather than
+		# directly behind a stack of planks that hides everything but their hat
+		pitches.append(float(spec["x"]) + 36.0)
+	spawn_folk("market", pitches, 1, 62.0, 0.0)
+
+	# ...and a few customers browsing in FRONT of everything, who do wander
+	# Customers browse the OPEN ground either end of the row and the gap in the
+	# middle, rather than parked in front of a counter where the stall wins
+	# every tap. Stalls run 400..1560 and are 168 wide.
+	spawn_folk("market_shoppers", [235.0, 1000.0, 1678.0], 4, 0.0, 90.0)
 
 	# her bike, so the whole land is two taps from anywhere
 	var bike := Nature.Bike.new()
@@ -79,6 +96,9 @@ func _ready() -> void:
 	interactables.append(bike)
 
 	setup_player(arrival_x({"home": HOME_SIGN_X + 90.0, "bike": 640.0}, 220.0))
+	# Summer walks along the FRONT of the market, in front of the stalls — she
+	# used to be drawn behind them and disappear as she passed
+	player.z_index = 4
 
 
 # --- world queries the player relies on -------------------------------------
@@ -217,7 +237,10 @@ class Stall extends Node2D:
 		_t = randf() * 5.0
 
 	func tap_score(wp: Vector2) -> float:
-		return clampf(1.0 - (wp - global_position - Vector2(0, -96.0)).length() / 150.0, 0.0, 1.0)
+		# Centred on the counter, and tighter than it was: a 150px zone reached
+		# so far that a customer standing in front of the stall could not be
+		# talked to, because the stall won the tap on their own head.
+		return clampf(1.0 - (wp - global_position - Vector2(0, -80.0)).length() / 105.0, 0.0, 1.0)
 
 	func try_tap(_wp: Vector2) -> bool:
 		return true

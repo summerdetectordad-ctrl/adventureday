@@ -74,6 +74,63 @@ const PEOPLE := {
 		],
 	},
 
+	"bo": {
+		"name": "bo", "role": "trader", "hat": "cap", "top": "8fc48a",
+		"hello": "i am bo. i cut all the planks.",
+		"tells": [
+			["a plank starts as a whole log.", "every plank starts as a round log. we saw it into flat boards."],
+			["wood is stronger the long way.", "a plank is much stronger along its length than across it. that is the grain."],
+			["wet wood bends, dry wood snaps.", "we dry the wood first. wet wood bends and then goes out of shape."],
+		],
+	},
+	"vi": {
+		"name": "vi", "role": "trader", "hat": "bun", "top": "c4a0d8",
+		"hello": "i am vi. i twist the rope.",
+		"tells": [
+			["rope is lots of thin threads.", "rope is many thin threads twisted together. that is what makes it strong."],
+			["twisting is what holds it.", "the twist is the trick. it makes the threads grip each other and hold."],
+			["a knot is stronger than a nail.", "a good knot can hold more than a nail, and you can undo it again."],
+		],
+	},
+	"sid": {
+		"name": "sid", "role": "trader", "hat": "scarf", "top": "e8b06a",
+		"hello": "i am sid. i sell the pie tins.",
+		"tells": [
+			["a tin spreads the heat.", "a metal tin spreads the heat evenly, so the bottom of the pie cooks too."],
+			["pastry likes cold hands.", "keep the butter cold and the pastry stays flaky. warm hands make it tough."],
+			["let a pie rest before you cut it.", "a pie needs a few minutes out of the oven or the middle runs everywhere."],
+		],
+	},
+
+	# --- the market: people doing their shopping ----------------------------
+	"meg": {
+		"name": "meg", "role": "shopper", "hat": "bunches", "top": "f2b8cf",
+		"hello": "i am meg. i am buying seeds for my nan.",
+		"tells": [
+			["ask before you touch the fruit.", "at a market you ask first. the trader will pick you the best one."],
+			["the best stall has a queue.", "if a stall has a little queue, that is usually the good one."],
+			["bring your own basket.", "i always bring a basket. then nothing needs wrapping up."],
+		],
+	},
+	"tom": {
+		"name": "tom", "role": "shopper", "hat": "beanie", "top": "6fb3d2",
+		"hello": "i am tom. i am here for wood.",
+		"tells": [
+			["count your change.", "always count what you get back. traders are honest but hands are busy."],
+			["heavy things go in the bottom.", "pack the heavy things first, at the bottom, or you squash everything."],
+			["markets start very early.", "the traders were setting up while it was still dark this morning."],
+		],
+	},
+	"ada": {
+		"name": "ada", "role": "shopper", "hat": "sunhat", "top": "a8d5a2",
+		"hello": "i am ada. i come here every week.",
+		"tells": [
+			["you can ask what things are.", "nobody minds being asked what something is. that is how you learn it."],
+			["food that grew nearby is fresher.", "the shorter the trip from the field, the fresher it is when you eat it."],
+			["say please and thank you.", "a please and a thank you get you a long way at a market."],
+		],
+	},
+
 	# --- dino land: the fossil hunters --------------------------------------
 	"finn": {
 		"name": "finn", "role": "adventurer", "hat": "sunhat", "top": "cfc192",
@@ -129,7 +186,9 @@ const PEOPLE := {
 static func who_lives_in(where: String) -> Array:
 	match where:
 		"meadow": return ["pip", "nell", "gus"]
-		"market": return ["rosa", "sam", "tess"]
+		# one trader per stall, in stall order: wood, paint, planks, rope, seeds, tins
+		"market": return ["rosa", "sam", "bo", "vi", "tess", "sid"]
+		"market_shoppers": return ["meg", "tom", "ada"]
 		"dino": return ["finn", "ivy"]
 		"cove": return ["ben", "peg", "hal"]
 	return []
@@ -186,6 +245,16 @@ class Person extends Node2D:
 		# the crate starts a conversation instead. The log or crate wins there,
 		# always — she can talk to them a step to either side.
 		var z := get_parent()
+		# Over a counter and its buttons a person is DAMPENED rather than
+		# silenced: their body is genuinely in front of the button, so a tap
+		# there should reach the stall, but a tap on their head — which is above
+		# the band — should still reach them.
+		var damp := 1.0
+		if z != null and "people_keep_clear" in z:
+			for r in z.people_keep_clear:
+				if (r as Rect2).has_point(wp):
+					damp = 0.3
+					break
 		if z != null and "blocks" in z:
 			for b in z.blocks:
 				if is_instance_valid(b) \
@@ -193,7 +262,8 @@ class Person extends Node2D:
 						and wp.y > b.position.y - b.h - 30.0:
 					return 0.0
 		# 72, not 92: they are small figures, and a generous hitbox was grabby
-		return clampf(1.0 - (wp - global_position - Vector2(0, -46)).length() / 72.0, 0.0, 1.0)
+		return clampf(1.0 - (wp - global_position - Vector2(0, -46)).length() / 72.0,
+			0.0, 1.0) * damp
 
 	func try_tap(_wp: Vector2) -> bool:
 		return true
@@ -213,7 +283,7 @@ class Person extends Node2D:
 		t += delta
 		if _wave > 0.0:
 			_wave = maxf(0.0, _wave - delta * 0.7)
-		if not _talking:
+		if not _talking and roam > 0.5:
 			if _pause > 0.0:
 				_pause -= delta
 			else:
@@ -229,7 +299,8 @@ class Person extends Node2D:
 		queue_redraw()
 
 	func walking() -> bool:
-		return not _talking and _pause <= 0.0
+		# a trader stood at their own stall has nowhere to go
+		return roam > 0.5 and not _talking and _pause <= 0.0
 
 	func _draw() -> void:
 		var s: Dictionary = spec()
@@ -259,6 +330,12 @@ class Person extends Node2D:
 		elif str(s.get("role", "kid")) == "trader":
 			# an apron
 			DrawKit.rounded_rect(self, Rect2(-9, -50 + bob, 18, 18), 4.0, Color("efe3c8"))
+		elif str(s.get("role", "kid")) == "shopper":
+			# a basket over the arm, so a customer reads as a customer
+			DrawKit.rounded_rect(self, Rect2(-fx * 16.0 - 7.0, -44 + bob, 14, 11),
+				3.0, Color("d9b98c"))
+			draw_arc(Vector2(-fx * 16.0, -44 + bob), 7.0, PI, TAU, 8,
+				Color("bb9764"), 2.0, true)
 		elif str(s.get("role", "kid")) == "adventurer":
 			# a strap across, and a pack on the back
 			DrawKit.rounded_rect(self, Rect2(-15 * fx - 5, -58 + bob, 10, 22), 4.0,

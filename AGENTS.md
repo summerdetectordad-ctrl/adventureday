@@ -267,3 +267,27 @@ CARDS CLOSE WHEN SHE MOVES ON. `Zone.handle_tap` calls `dismiss_cards()` on
 every tap that reaches the world, so walking away or reaching for something
 else puts the speech bubble away. Taps on the card's own talk button never
 reach the world, so pressing that is safe.
+
+## The market crowd
+
+Two kinds of person, and they are laid out deliberately:
+
+- SIX TRADERS, one per stall, stood at the back of their own pitch. `roam = 0`
+  so they never leave it (a `Person` with no roam also stops animating a walk),
+  `depth 62` so head and shoulders clear the counter, offset +36 px so they
+  stand BESIDE their goods rather than behind a stack of planks that hides
+  everything but their hat. Drawn at z 1, behind the stalls at z 2.
+- THREE CUSTOMERS browsing in front, at z 4 with the player. They patrol the
+  open ground either end of the row and the gap in the middle, because a
+  customer parked in front of a counter is one the stall out-scores.
+
+Z-ORDER: background < traders (1) < stalls (2) < customers and Summer (4).
+Summer used to be at the default 0 and vanished behind every stall she walked
+past.
+
+`Zone.people_keep_clear` is a list of world rectangles where a person's tap
+score is DAMPENED to 0.3 — the market fills it with each stall's button band.
+Dampened, not zeroed: their body genuinely is in front of the button, so a tap
+there should reach the stall, but a tap on their head is above the band and
+still reaches them. The stall's own tap radius came down from 150 to 105 for
+the same reason — at 150 it won the tap on a customer's own head.
