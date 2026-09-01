@@ -122,7 +122,9 @@ func _ready() -> void:
 	# Pattern Patch, planted at the end of the garden row
 	var patch_game := Grove.GameSpot.new()
 	patch_game.game = "pattern"
-	patch_game.position = Vector2(1548.0, GROUND_Y - 96.0)
+	# Up above the garden it belongs to, and clear of the log at 1560 — the
+	# star used to sit right on it, so aiming at the log hit the star.
+	patch_game.position = Vector2(1440.0, GROUND_Y - 200.0)
 	add_child(patch_game)
 	interactables.append(patch_game)
 
@@ -190,10 +192,14 @@ func _ready() -> void:
 
 	# blocks to jump over and stand on
 	for spec in [
-		["log", 1560.0, 116.0, 54.0],
+		# 3050 not 1560: at 1560 the berry bush next to it hung fruit right over
+		# the log, so aiming at the log picked berries instead
+		["log", 3050.0, 116.0, 54.0],
 		["crate", 2050.0, 120.0, 72.0],
 		["rock", 2450.0, 132.0, 58.0],
-		["crate", 3270.0, 120.0, 72.0],
+		# 3180 not 3270: one of the children wanders over 3230-3450, and a kid
+		# standing on the crate stole the taps meant for jumping it
+		["crate", 3180.0, 120.0, 72.0],
 	]:
 		var blk := Nature.Block.new()
 		blk.kind = spec[0]
@@ -411,6 +417,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		if handle_tap(event.position, wp):
 			return
 
+		# A DOUBLE TAP ALWAYS MEANS JUMP. It is checked before anything can be
+		# selected, because the second tap of a jump often lands on a butterfly
+		# or a game marker and she would end up in a conversation instead of in
+		# the air. The first tap of the pair already did whatever it was going
+		# to do; the second one is only ever about jumping.
+		if is_double:
+			last_tap_t = -10.0
+			pending_enter = false
+			pending_interact = {}
+			player.try_jump(wp)
+			return
+
 		# Weighted hitboxes: every candidate scores by how CENTRAL the tap is
 		# (1.0 dead-on, fading to 0 at the hitbox edge). Where hitboxes overlap,
 		# the thing she was actually aiming for wins.
@@ -446,11 +464,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			player.target_x = DOOR_X + 40.0
 			return
 
-		if is_double:
-			last_tap_t = -10.0
-			pending_interact = {}
-			player.try_jump(wp)
-			return
 		last_tap_t = now
 		last_tap_pos = wp
 		pending_enter = false

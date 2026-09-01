@@ -233,3 +233,26 @@ badly scaled icon for the taskbar.
 points at a real PNG inside the file — worth running if the icon is ever
 regenerated. GOTCHA: bash's printf reads `\x` escapes greedily and produced a
 subtly wrong file; the script uses octal `\NNN` instead.
+
+## Taps: who gets them
+
+Three separate playtest complaints turned out to be the same class of bug —
+two things wanting the same tap. Worth checking with a probe rather than
+waiting for the next report.
+
+- CARDS DO NOT TAKE TAPS. `DialogueCard` and `AffirmationCard` are
+  `MOUSE_FILTER_IGNORE`, so a tap aimed at a berry or a log behind them reaches
+  the world. Their buttons are children and still get their own events. They
+  auto-dismiss; there is no tap-to-dismiss any more, and there does not need to
+  be, because they no longer block anything.
+- A DOUBLE TAP ALWAYS MEANS JUMP. `main._unhandled_input` checks `is_double`
+  BEFORE scanning interactables. The second tap of a jump often lands on a
+  butterfly or a game marker, and she would end up in a conversation instead of
+  in the air. The first tap of the pair already did whatever it was doing.
+- PEOPLE YIELD TO BLOCKS. `Folk.Person.tap_score` returns 0 for any point over
+  one of the zone's `blocks`. They wander, so sooner or later one stands on a
+  crate; the crate wins there and she can talk to them a step to either side.
+
+A probe that samples the world and reports where two interactables both score
+highly — and where any interactable's zone covers a block — found all of these
+at once. Rebuild it if the layout changes much.

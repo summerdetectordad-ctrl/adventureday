@@ -52,7 +52,11 @@ func _ready() -> void:
 	size = Vector2(minf(820.0, vs.x - 80.0), h)
 	pivot_offset = size / 2.0
 	position = Vector2((vs.x - size.x) / 2.0, vs.y + 20.0)
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	# The card does NOT take taps. She is usually reaching for a berry or a log
+	# just behind it, and having the card eat that tap — and dismiss itself
+	# instead of picking the berry — was maddening. IGNORE hands the event to
+	# the world; the talk button is a child and still gets its own.
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var fs: int = 26 if size.y > 140.0 else 22
 	_label1 = _make_label(line1, 22.0, Color("6b5a4a"), fs)
@@ -118,13 +122,6 @@ func dismiss() -> void:
 	var tw := create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
 	tw.tween_property(self, "position:y", get_viewport().get_visible_rect().size.y + 30.0, 0.35)
 	tw.tween_callback(queue_free)
-
-
-func _gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
-		accept_event()
-		if not _snapping:
-			dismiss()
 
 
 func _draw() -> void:

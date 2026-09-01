@@ -389,7 +389,7 @@ func spawn_folk(where: String, spots: Array, z := 0, depth := 0.0) -> void:
 		var p := Folk.Person.new()
 		p.id = ids[i]
 		p.home_x = float(spots[i])
-		p.roam = 110.0
+		p.roam = 85.0
 		# `depth` stands them further back: higher up the screen and a little
 		# smaller, which is how a trader gets to be behind their counter and
 		# still be visible over it

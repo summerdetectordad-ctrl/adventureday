@@ -27,7 +27,8 @@ func _ready() -> void:
 	size = Vector2(minf(780.0, vs.x - 80.0), clampf(dirt - 8.0, 96.0, CARD_HEIGHT))
 	pivot_offset = size / 2.0
 	position = Vector2((vs.x - size.x) / 2.0, vs.y + 20.0)
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	# see DialogueCard: never eat a tap meant for the world
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var label := Label.new()
 	label.text = aff.get("text", "")

@@ -181,7 +181,19 @@ class Person extends Node2D:
 		return Folk.PEOPLE.get(id, Folk.PEOPLE["pip"])
 
 	func tap_score(wp: Vector2) -> float:
-		return clampf(1.0 - (wp - global_position - Vector2(0, -46)).length() / 92.0, 0.0, 1.0)
+		# A person NEVER claims a tap that landed on something she jumps. They
+		# wander, so sooner or later one stands on a crate, and then aiming at
+		# the crate starts a conversation instead. The log or crate wins there,
+		# always — she can talk to them a step to either side.
+		var z := get_parent()
+		if z != null and "blocks" in z:
+			for b in z.blocks:
+				if is_instance_valid(b) \
+						and absf(wp.x - b.position.x) < b.w * 0.5 + 10.0 \
+						and wp.y > b.position.y - b.h - 30.0:
+					return 0.0
+		# 72, not 92: they are small figures, and a generous hitbox was grabby
+		return clampf(1.0 - (wp - global_position - Vector2(0, -46)).length() / 72.0, 0.0, 1.0)
 
 	func try_tap(_wp: Vector2) -> bool:
 		return true
