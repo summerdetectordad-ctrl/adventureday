@@ -66,16 +66,24 @@ func _ready() -> void:
 	_camera_btn = IconButton.new("camera" if action == "camera" else "tell", bs)
 	_camera_btn.position = Vector2(size.x - bs - 20.0, size.y / 2.0 - bs / 2.0)
 	_camera_btn.pressed.connect(_on_camera if action == "camera" else _on_tell)
+	# Hidden until they have actually answered. Offering it while they are
+	# still mid-sentence invites a tap that cuts the reply off, and the
+	# conversation stops making sense.
+	_camera_btn.visible = false
+	_camera_btn.scale = Vector2(0.5, 0.5)
 	add_child(_camera_btn)
 
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
 	tw.tween_property(self, "position:y", _resting_y(), 0.5)
 	Sound.card_sound()
 
-	# the animal replies after a friendly pause
+	# They reply after a friendly pause, and only then is there anything worth
+	# pressing — so the button arrives with the answer.
 	get_tree().create_timer(1.5).timeout.connect(func() -> void:
-		if not _dismissing and not _snapping and is_instance_valid(_label2):
-			_label2.text = line2)
+		if _dismissing or _snapping or not is_instance_valid(_label2):
+			return
+		_label2.text = line2
+		_offer_button())
 
 	get_tree().create_timer(SHOW_SECONDS).timeout.connect(func() -> void:
 		if not _snapping:
@@ -157,3 +165,15 @@ func _on_tell() -> void:
 func _resting_y() -> float:
 	var vs := get_viewport().get_visible_rect().size
 	return clampf(DrawKit.ground_screen_y(self) + 4.0, 0.0, vs.y - size.y - 6.0)
+
+
+## The reply has landed, so now there is something to ask about. The button
+## pops in rather than blinking on, so it reads as arriving rather than as
+## having been missed.
+func _offer_button() -> void:
+	if not is_instance_valid(_camera_btn) or _dismissing or _snapping:
+		return
+	_camera_btn.visible = true
+	_camera_btn.scale = Vector2(0.5, 0.5)
+	var tw := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(_camera_btn, "scale", Vector2.ONE, 0.32)

@@ -285,6 +285,11 @@ Z-ORDER: background < traders (1) < stalls (2) < customers and Summer (4).
 Summer used to be at the default 0 and vanished behind every stall she walked
 past.
 
+THE TALK BUTTON WAITS FOR THE REPLY. `DialogueCard` hides it until line two
+has actually appeared, then pops it in. Offering it while somebody is still
+mid-sentence invites a tap that cuts the reply off and the conversation stops
+making sense. Applies to the camera button on animals too.
+
 PEOPLE GET OUT OF THE WAY. `Zone.mind_her_space()` runs in every world: while
 she is stood still at something that is not a person, the ONE person closest to
 walking across her `give_way()`s and ambles off the other way instead. Only
