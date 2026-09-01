@@ -23,7 +23,8 @@ static func show_card(layer: Node, aff_d: Dictionary) -> void:
 
 func _ready() -> void:
 	var vs := get_viewport().get_visible_rect().size
-	size = Vector2(minf(780.0, vs.x - 80.0), CARD_HEIGHT)
+	var dirt: float = vs.y - DrawKit.ground_screen_y(self)
+	size = Vector2(minf(780.0, vs.x - 80.0), clampf(dirt - 8.0, 96.0, CARD_HEIGHT))
 	pivot_offset = size / 2.0
 	position = Vector2((vs.x - size.x) / 2.0, vs.y + 20.0)
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -44,7 +45,8 @@ func _ready() -> void:
 	icon.position = Vector2(78, size.y / 2.0)
 	add_child(icon)
 
-	var target_y := vs.y - size.y - 40.0
+	# in the dirt below the ground line, out of the way of the meadow
+	var target_y := clampf(DrawKit.ground_screen_y(self) + 4.0, 0.0, vs.y - size.y - 6.0)
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
 	tw.tween_property(self, "position:y", target_y, 0.5)
 	Sound.card_sound()

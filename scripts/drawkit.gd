@@ -639,3 +639,18 @@ static func vegan_badge(c: CanvasItem, at: Vector2, r: float) -> void:
 		c.draw_colored_polygon(pts, green if pass_i == 0 else Color.WHITE)
 	# the vein down the middle of the leaf
 	c.draw_line(base + dir * 0.14, tip - dir * 0.1, green, maxf(1.2, r * 0.1))
+
+
+## Where the ground line falls on the screen right now, for UI that wants to
+## keep out of the way of the world. The camera is effectively locked
+## vertically, but the visible height changes with the screen's shape and with
+## the UI scale, so this is worked out rather than assumed.
+##
+## Clamped so the answer is always somewhere sensible even in an odd viewport.
+static func ground_screen_y(node: Node) -> float:
+	var vp := node.get_viewport()
+	if vp == null:
+		return 600.0
+	var vs := vp.get_visible_rect().size
+	var y: float = (vp.get_canvas_transform() * Vector2(0.0, 600.0)).y
+	return clampf(y, vs.y * 0.5, vs.y - 30.0)

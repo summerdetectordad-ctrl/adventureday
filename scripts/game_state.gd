@@ -81,6 +81,10 @@ var reading_level := 1
 ## tree two does not throw her back to the home tree after every single one.
 var last_build_site := "home"
 
+## Worked out at startup from the physical screen — see _fit_to_screen.
+var ui_scale := 1.0
+var screen_inches := 0.0
+
 ## The people she has already said hello to, by id. A first meeting gets the
 ## introduction; after that they just chat.
 var met_folk: Array = []
@@ -111,6 +115,31 @@ var pie_stack: Array = []        # the fruit pie in progress
 func _ready() -> void:
 	randomize()
 	load_game()
+	_fit_to_screen()
+
+
+## The game was laid out for a tablet. On a phone the same drawing lands on a
+## much smaller piece of glass, so the buttons come out under the ~9 mm that a
+## finger actually needs and everything reads as tiny. Scaling the whole canvas
+## up fixes it in one place: she sees a little less of the world at once, and
+## every control grows to match. Tablets are left alone.
+func _fit_to_screen() -> void:
+	var dpi := DisplayServer.screen_get_dpi()
+	var px := DisplayServer.screen_get_size()
+	if dpi <= 0 or px.x <= 0 or px.y <= 0:
+		return
+	var inches := sqrt(float(px.x * px.x + px.y * px.y)) / float(dpi)
+	var f := 1.0
+	if inches < 6.0:
+		f = 1.5
+	elif inches < 7.6:
+		f = 1.32
+	elif inches < 9.5:
+		f = 1.14
+	screen_inches = inches
+	ui_scale = f
+	if f != 1.0 and get_window() != null:
+		get_window().content_scale_factor = f
 
 
 func random_find_type() -> String:

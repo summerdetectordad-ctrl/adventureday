@@ -184,3 +184,24 @@ The app ships with **no Android permissions at all** — no INTERNET included.
 Keep it that way: it is what makes the Families Policy and the data safety
 declaration trivial. Adding any networking would change the whole compliance
 picture.
+
+## Phones vs tablets
+
+The game is laid out for 1280x800 with `canvas_items` + `expand`, which keeps
+the logical height at 800 and lets the width grow. On a 21:9 phone that gives a
+1742-wide logical viewport — 36% more world than the design assumes — so
+everything reads as small and the buttons fall under the ~9 mm a finger needs.
+
+`GameState._fit_to_screen()` measures the physical screen (DPI + pixel size)
+and sets `content_scale_factor` accordingly: under 6" → 1.5, under 7.6" → 1.32,
+under 9.5" → 1.14, tablets and desktops → 1.0. A 6.8" phone lands at 1.32,
+which brings the logical viewport back to about 1320x606 — very close to the
+1280 the art was drawn for. If a device guesses wrong, that one function is the
+only place to change.
+
+CARDS SIT IN THE DIRT. `DrawKit.ground_screen_y()` works out where the ground
+line falls on screen (the camera is effectively locked vertically, but the
+visible height moves with the screen shape and the UI scale). DialogueCard and
+AffirmationCard place themselves below it and SHRINK to fit the strip that is
+available — on a long phone that strip is only ~100 px. A card that covers the
+meadow is worse than a card with slightly smaller text.

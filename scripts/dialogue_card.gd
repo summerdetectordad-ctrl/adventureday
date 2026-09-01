@@ -10,7 +10,9 @@ signal photo_moment
 ## this — they know things, and being told something is better than a snapshot.
 signal tell_moment
 
-const CARD_HEIGHT := 190.0
+## Kept slim so it fits in the strip of dirt below the ground line — on a
+## long phone screen that strip is not very tall.
+const CARD_HEIGHT := 164.0
 const SHOW_SECONDS := 9.0
 
 var line1 := ""
@@ -42,21 +44,28 @@ static func show_chat(layer: Node, l1: String, l2: String, act := "camera",
 
 func _ready() -> void:
 	var vs := get_viewport().get_visible_rect().size
-	size = Vector2(minf(820.0, vs.x - 80.0), CARD_HEIGHT)
+	# The dirt below the ground line is all the room there is, and on a long
+	# phone screen that is not much. Shrink to fit rather than sit over the
+	# meadow — the words matter less than being able to see what she is doing.
+	var dirt: float = vs.y - DrawKit.ground_screen_y(self)
+	var h: float = clampf(dirt - 8.0, 104.0, CARD_HEIGHT)
+	size = Vector2(minf(820.0, vs.x - 80.0), h)
 	pivot_offset = size / 2.0
 	position = Vector2((vs.x - size.x) / 2.0, vs.y + 20.0)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
-	_label1 = _make_label(line1, 26.0, Color("6b5a4a"))
-	_label2 = _make_label("", size.y / 2.0 + 8.0, Color("5c7a54"))
+	var fs: int = 26 if size.y > 140.0 else 22
+	_label1 = _make_label(line1, 22.0, Color("6b5a4a"), fs)
+	_label2 = _make_label("", size.y / 2.0 + 4.0, Color("5c7a54"), fs)
 
-	_camera_btn = IconButton.new("camera" if action == "camera" else "tell", 92.0)
-	_camera_btn.position = Vector2(size.x - 112, size.y / 2.0 - 46.0)
+	var bs: float = clampf(size.y - 40.0, 64.0, 92.0)
+	_camera_btn = IconButton.new("camera" if action == "camera" else "tell", bs)
+	_camera_btn.position = Vector2(size.x - bs - 20.0, size.y / 2.0 - bs / 2.0)
 	_camera_btn.pressed.connect(_on_camera if action == "camera" else _on_tell)
 	add_child(_camera_btn)
 
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
-	tw.tween_property(self, "position:y", vs.y - size.y - 40.0, 0.5)
+	tw.tween_property(self, "position:y", _resting_y(), 0.5)
 	Sound.card_sound()
 
 	# the animal replies after a friendly pause
@@ -69,14 +78,14 @@ func _ready() -> void:
 			dismiss())
 
 
-func _make_label(text: String, y: float, col: Color) -> Label:
+func _make_label(text: String, y: float, col: Color, fs := 26) -> Label:
 	var label := Label.new()
 	label.text = text
 	label.position = Vector2(48, y)
-	label.size = Vector2(size.x - 190, size.y / 2.0 - 24.0)
+	label.size = Vector2(size.x - 190, size.y / 2.0 - 14.0)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 29)
+	label.add_theme_font_size_override("font_size", fs)
 	label.add_theme_color_override("font_color", col)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(label)
@@ -143,3 +152,11 @@ func _on_tell() -> void:
 	tell_moment.emit()
 	await get_tree().create_timer(7.5).timeout
 	dismiss()
+
+
+## Sit in the dirt below the ground line, so a chat never covers the meadow.
+## If the dirt is too shallow for the card — a very wide, short screen — it
+## goes as low as it can instead.
+func _resting_y() -> float:
+	var vs := get_viewport().get_visible_rect().size
+	return clampf(DrawKit.ground_screen_y(self) + 4.0, 0.0, vs.y - size.y - 6.0)
