@@ -67,4 +67,6 @@ address, with a new date at the top.
 
 ## Contact
 
+Published at https://adventureday.co.uk/privacy
+
 Questions about this policy: summerdetectordad@gmail.com

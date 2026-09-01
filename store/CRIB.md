@@ -1,3 +1,4 @@
+| Privacy policy URL | **https://adventureday.co.uk/privacy** — live |
 # Play Console form answers — Adventure Day
 
 Everything below is the literal answer to give. Your app is unusually simple to
@@ -101,13 +102,19 @@ and where you stand:
 
 ---
 
-## Hosting the privacy policy
+## The privacy policy is live
 
-It must be a public URL that loads without a login. Cheapest options:
+**https://adventureday.co.uk/privacy**
 
-1. **GitHub Pages** — push this repo (or a one-file repo) and enable Pages.
-   Free, five minutes, gives `https://<user>.github.io/adventureday/privacy`.
-2. **A page on the Solvith site** — if you have a CMS, paste it in.
+Hosted on Firebase Hosting, project `adventureday-uk`, from the
+`adventureday-site` repo. It must keep loading for as long as the app is
+listed on Play.
 
-Convert `PRIVACY.md` to HTML or paste as-is into any page. Google only checks
-that the URL loads and mentions your app.
+The Markdown source of record is `store/PRIVACY.md` in this repo; the page
+itself is `public/privacy.html` in the site repo. Change one, change the other.
+
+To redeploy after an edit:
+
+```bash
+cd C:/adventureday-site && firebase deploy --only hosting
+```
